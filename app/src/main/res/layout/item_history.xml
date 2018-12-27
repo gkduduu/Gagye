@@ -14,9 +14,15 @@
         <View
             android:id="@+id/HIS_BAR"
             android:layout_width="4dp"
-            android:layout_height="20dp"
+            android:layout_height="25dp"
             android:background="#ff0000"
             android:layout_marginLeft="10dp"></View>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D5D5D5"
+            android:layout_marginTop="24dp"></View>
 
         <TextView
             android:layout_width="wrap_content"
