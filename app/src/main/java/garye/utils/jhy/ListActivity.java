@@ -4,12 +4,22 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import garye.utils.jhy.adapter.HistoryAdapter;
+import garye.utils.jhy.data.MainData;
+
 public class ListActivity extends AppCompatActivity {
+
+    RecyclerView historyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +36,15 @@ public class ListActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        historyView = findViewById(R.id.HIS_RECYCLER);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        historyView.setHasFixedSize(true);
+        historyView.setLayoutManager(layoutManager);
+        List<MainData> data = new ArrayList<>();
+        data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());
+        data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());
+        historyView.setAdapter(new HistoryAdapter(getApplicationContext(), data, R.layout.activity_list));
     }
 
     @Override
