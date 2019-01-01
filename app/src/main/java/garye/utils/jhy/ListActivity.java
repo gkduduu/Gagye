@@ -12,12 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import garye.utils.jhy.adapter.HistoryAdapter;
 import garye.utils.jhy.data.MainData;
 
-public class ListActivity extends AppCompatActivity {
+public class ListActivity extends BaseActivity {
 
     RecyclerView historyView;
 
@@ -25,10 +26,10 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,10 +41,25 @@ public class ListActivity extends AppCompatActivity {
         historyView = findViewById(R.id.HIS_RECYCLER);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         historyView.setHasFixedSize(true);
+        historyView.setNestedScrollingEnabled(false);
         historyView.setLayoutManager(layoutManager);
+
+
         List<MainData> data = new ArrayList<>();
-        data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());
-        data.add(new MainData());data.add(new MainData());data.add(new MainData());data.add(new MainData());
+        data.add(new MainData("",Calendar.getInstance().getTime(),"HY게스트하우스","지출","10,000원","크마카드","뿌잉","/image/0010.jpg","숙박","하영"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"로또1등 당첨","수입","2,200,000,000원","하나통장","댑악","/image/0010.jpg","기타","하영"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"토횬떡뽁이","지출","900,000원","크마카드","존맛","/image/0010.jpg","식사","하영"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"힐튼 후쿠오카 씨오크 30박","지출","6,000,000원","크마카드","뿌잉","/image/0010.jpg","숙박","하영"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+        data.add(new MainData("",Calendar.getInstance().getTime(),"e마트","지출","46,000원","토횬우리","뿌잉","/image/0010.jpg","숙박","토횬"));
+
         historyView.setAdapter(new HistoryAdapter(getApplicationContext(), data, R.layout.activity_list));
     }
 
