@@ -14,7 +14,7 @@ public class MainData extends RealmObject implements Serializable {
 
     @PrimaryKey
     private String seq;
-    private Date date;
+    private String date;
     private String shop;
     private String state;
     private String money;
@@ -28,10 +28,10 @@ public class MainData extends RealmObject implements Serializable {
 
     }
 
-    public MainData(String seq,Date date, String shop, String state, String money, String card,String comment, String image, String category,String user) {
+    public MainData(String seq,String date, String shop, String state, String money, String card,String comment, String image, String category,String user) {
         setSeq(seq);
         setDate(date);
-        setShop(shop);
+        setStore(shop);
         setState(state);
         setMoney(money);
         setCard(card);
@@ -49,19 +49,19 @@ public class MainData extends RealmObject implements Serializable {
         this.seq = seq;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public String getShop() {
+    public String getStore() {
         return shop;
     }
 
-    public void setShop(String shop) {
+    public void setStore(String shop) {
         this.shop = shop;
     }
 

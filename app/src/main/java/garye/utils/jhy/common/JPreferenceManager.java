@@ -7,7 +7,7 @@ public class JPreferenceManager {
 
     public static String getString(Context context, String key) {
         SharedPreferences sharedPref = context.getSharedPreferences("gagye", Context.MODE_PRIVATE);
-        return sharedPref.getString(key,"");
+        return sharedPref.getString(key,null);
     }
 
     public static void setString(Context context, String key, String value) {

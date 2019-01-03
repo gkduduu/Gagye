@@ -1,7 +1,18 @@
 package garye.utils.jhy;
 
+import android.accounts.AccountManager;
+import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,8 +20,11 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,8 +51,26 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import garye.utils.jhy.common.AlldayNotification;
+import garye.utils.jhy.common.JPreferenceManager;
+import garye.utils.jhy.sheet.SheetUtils;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+
 //https://www.google.co.kr/search?q=loading+gif&tbm=isch&tbs=rimg:CaIs9PeDXqbJIjhkPoWNMGNEVP1y07YtNLxsL7EPWPdIV3L8ypMSGOKvUcUAACDBcD1Fhex2na5j89hmek4gA-VaRSoSCWQ-hY0wY0RUEUcE5TaIypXZKhIJ_1XLTti00vGwRh9U_13E7YafoqEgkvsQ9Y90hXchHWkgCYuCGw4CoSCfzKkxIY4q9REXvzUdCggTw5KhIJxQAAIMFwPUURG0rNguZl4P8qEgmF7HadrmPz2BFxATTxNmp87ioSCWZ6TiAD5VpFEXd6ePIuFxXQ&tbo=u&sa=X&ved=2ahUKEwip8J6cl8zfAhUKwLwKHZZwDk4Q9C96BAgBEBs&biw=1920&bih=889&dpr=1
 public class SplashActivity extends BaseActivity {
+
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+
+    private static final String BUTTON_TEXT = "Call Google Sheets API";
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+    private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
+
+    GoogleAccountCredential mCredential;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,146 +80,141 @@ public class SplashActivity extends BaseActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
-        Glide.with(this).asGif().load(R.drawable.loading).into((ImageView)findViewById(R.id.SPL_IMAGE));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel notificationChannel = new NotificationChannel("channel_id", "channel_name", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription("channel description");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.GREEN);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setVibrationPattern(new long[]{100, 200, 100, 200});
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
 
-//        Map<String, Object> user = new HashMap<>();
-////        user.put("seq", "Ada");
-//        user.put("date", Calendar.getInstance().getTime());
-//        user.put("shop", "로또1등 당첨~~");
-//        user.put("state", "수입!!");
-//        user.put("money", "2,200,000,000원");
-//        user.put("card", "하나통장");
-//        user.put("comment", "댑악!!!!");
-//        user.put("image", "/image/0010.jpg");
-//        user.put("category", "기타");
-//        user.put("user", "하영");
-//
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        db.collection("history")
-//                .add(user)
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Log.d("jhy", "DocumentSnapshot added with ID: " + documentReference.getId());
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.w("jhy", "Error adding document", e);
-//                    }
-//                });
-//
-//        db.collection("history").document("NM5PK8bJ4olGzTy1xDrD")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            DocumentSnapshot document = task.getResult();
-//                            Log.d("jhy", document.getId() + " => " + document.getData());
-////                            for (QueryDocumentSnapshot document : task.getResult()) {
-////                                Log.d("jhy", document.getId() + " => " + document.getData());
-////                            }
-//                        } else {
-//                            Log.w("jhy", "Error getting documents.", task.getException());
-//                        }
-//                    }
-//                });
-//
-//        db.collection("history")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-////                            DocumentSnapshot document = task.getResult();
-////                            Log.d("jhy", document.getId() + " => " + document.getData());
-////                            for (QueryDocumentSnapshot document : task.getResult()) {
-////                                Log.d("jhy", document.getId() + " => " + document.getData());
-////                            }
-//                        } else {
-//                            Log.w("jhy", "Error getting documents.", task.getException());
-//                        }
-//                    }
-//                });
 
+        Glide.with(this).asGif().load(R.drawable.loading).into((ImageView) findViewById(R.id.SPL_IMAGE));
+
+        //스프레드시트 이용을 위한 구글 인증
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff());
+
+        connectSheet();
+
+        AlldayNotification.notify(this, "asdf", 9);
     }
 
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-        private com.google.api.services.sheets.v4.Sheets mService = null;
-        private Exception mLastError = null;
 
-        MakeRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Android Quickstart")
-                    .build();
-        }
-
-        @Override
-        protected List<String> doInBackground(Void... params) {
-            try {
-                return getDataFromApi();
-            } catch (Exception e) {
-                e.getStackTrace();
-                mLastError = e;
-                cancel(true);
-                return null;
-            }
-        }
-
-        private List<String> getDataFromApi() throws IOException {
-            String spreadsheetId = "1uUayAOJlYP17jIxuZf3UsQA-sTLSfMcnYcur47ckNaE";
-            String range = "거래!B8";
-            List<String> results = new ArrayList<String>();
-
-            Object a1 = new Object();
-            a1 = "날짜";
-            Object b1 = new Object();
-            b1 = "금액";
-            Object c1 = new Object();
-            c1 = "사용처";
-            Object d1 = new Object();
-            d1 = "내용";
-            Object e1 = new Object();
-            e1 = "결제방법";
-            Object f1 = new Object();
-            f1 = "사용자";
-
-            ValueRange valueRange = new ValueRange();
-            valueRange.setValues(
-                    Arrays.asList(
-                            Arrays.asList(a1, b1, c1, d1, e1, f1)));
-            UpdateValuesResponse response = this.mService.spreadsheets().values().update(spreadsheetId, range, valueRange)
-                    .setValueInputOption("RAW")
-                    .execute();
-//            ValueRange response = this.mService.spreadsheets().values()
-//                    .get(spreadsheetId, range)
-//                    .execute();
-//            List<List<Object>> values = response.getValues();
-//            if (values != null) {
-//                results.add("날짜, 금액");
-//                for (List row : values) {
-//                    results.add(row.get(0) + ", " + row.get(1));
-//                }
-//            }
-            return results;
-        }
-    }
-
-    private static final String[] SCOPES = { SheetsScopes.SPREADSHEETS };
-    GoogleAccountCredential mCredential;
     @Override
-    protected void onResume() {
-        super.onResume();
-        startActivity(new Intent(this,MainActivity.class));
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_GOOGLE_PLAY_SERVICES:
+                if (resultCode != RESULT_OK) {
+                } else {
+                    connectSheet();
+                }
+                break;
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == RESULT_OK && data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        JPreferenceManager.setString(this,PREF_ACCOUNT_NAME,accountName);
+                        mCredential.setSelectedAccountName(accountName);
+                        connectSheet();
+                    }
+                }
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode == RESULT_OK) {
+                    connectSheet();
+                }
+                break;
+        }
+    }
 
-//        mCredential = GoogleAccountCredential.usingOAuth2(
-//                getApplicationContext(), Arrays.asList(SCOPES))
-//                .setBackOff(new ExponentialBackOff());
-//        new MakeRequestTask(mCredential).execute();
+
+    private void connectSheet() {
+        if (!isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        } else if (!isDeviceOnline()) {
+            //디바이스 오프라인
+        } else {
+            //인증 완료
+            Toast.makeText(this, "OK!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, SettingActivity.class));
+            finish();
+        }
+    }
+
+    private boolean isDeviceOnline() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    private boolean isGooglePlayServicesAvailable() {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(this);
+        return connectionStatusCode == ConnectionResult.SUCCESS;
+    }
+
+    private void acquireGooglePlayServices() {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(this);
+        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+        }
+    }
+
+    void showGooglePlayServicesAvailabilityErrorDialog(
+            final int connectionStatusCode) {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        Dialog dialog = apiAvailability.getErrorDialog(
+                this,
+                connectionStatusCode,
+                REQUEST_GOOGLE_PLAY_SERVICES);
+        dialog.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        connectSheet();
+    }
+
+    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
+    private void chooseAccount() {
+        if (EasyPermissions.hasPermissions(
+                this, android.Manifest.permission.GET_ACCOUNTS)) {
+            String accountName = JPreferenceManager.getString(this,PREF_ACCOUNT_NAME);
+            if (null == accountName) {
+                startActivityForResult(
+                        mCredential.newChooseAccountIntent(),
+                        REQUEST_ACCOUNT_PICKER);
+            } else {
+                mCredential.setSelectedAccountName(accountName);
+                connectSheet();
+
+            }
+        } else {
+            // Request the GET_ACCOUNTS permission via a user dialog
+            EasyPermissions.requestPermissions(
+                    this,
+                    "This app needs to access your Google account (via Contacts).",
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    android.Manifest.permission.GET_ACCOUNTS);
+        }
     }
 }
