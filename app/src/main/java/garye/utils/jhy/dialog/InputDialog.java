@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -30,6 +32,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import garye.utils.jhy.R;
@@ -81,6 +84,8 @@ public class InputDialog extends Dialog {
                 .setBackOff(new ExponentialBackOff());
 
         DATE = findViewById(R.id.INPUT_DATE);
+        Calendar ca = Calendar.getInstance();
+        DATE.setText(ca.get(Calendar.YEAR) + ". " + ca.get(Calendar.MONTH) + 1 + ". " + ca.get(Calendar.DATE));
         MONEY = findViewById(R.id.INPUT_MONEY);
         STORE = findViewById(R.id.INPUT_STORE);
         COMMENT = findViewById(R.id.INPUT_COMMENT);
@@ -92,6 +97,7 @@ public class InputDialog extends Dialog {
         SEND.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("jhy","clickc!!!!!!!");
                 mMaindata = new MainData();
                 mMaindata.setDate(DATE.getText().toString());
                 mMaindata.setMoney(MONEY.getText().toString());
@@ -107,6 +113,7 @@ public class InputDialog extends Dialog {
     }
 
     private void connectSheet() {
+        Log.i("jhy","connectSHeet!");
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -183,6 +190,7 @@ public class InputDialog extends Dialog {
         private Exception mLastError = null;
 
         MakeRequestTask(GoogleAccountCredential credential,MainData mainData) {
+            Log.i("jhy","MakeRequestTask!");
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mData = mainData;
@@ -194,14 +202,28 @@ public class InputDialog extends Dialog {
 
         @Override
         protected String doInBackground(Void... params) {
+            Log.i("jhy","doInBackground!");
             try {
                 return SheetUtils.putData(mService,mData);
-            } catch (Exception e) {
+            } catch (UserRecoverableAuthIOException e) {
+                Log.i("jhy","doInBackground!"  + e.getMessage());
+                mLastError = e;
+                activity.startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                e.getStackTrace();
+                cancel(true);
+                return null;
+            } catch(Exception e) {
                 mLastError = e;
                 e.getStackTrace();
                 cancel(true);
                 return null;
             }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            dismiss();
+            super.onPostExecute(s);
         }
     }
 

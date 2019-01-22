@@ -46,7 +46,7 @@ public class SheetUtils {
         List<String> results = new ArrayList<String>();
 
         Object a1 = new Object();
-        a1 = "날짜";
+        a1 = data.getDate();
         Object b1 = new Object();
         b1 = data.getMoney();
         Object c1 = new Object();
