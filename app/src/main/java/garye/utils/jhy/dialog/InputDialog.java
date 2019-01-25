@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -36,6 +38,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import garye.utils.jhy.R;
+import garye.utils.jhy.common.JConst;
 import garye.utils.jhy.common.JPreferenceManager;
 import garye.utils.jhy.data.MainData;
 import garye.utils.jhy.sheet.SheetUtils;
@@ -45,11 +48,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class InputDialog extends Dialog {
 
     GoogleAccountCredential mCredential;
-
-    static final int REQUEST_ACCOUNT_PICKER = 1000;
-    static final int REQUEST_AUTHORIZATION = 1001;
-    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
     private static final String BUTTON_TEXT = "Call Google Sheets API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
@@ -85,12 +83,18 @@ public class InputDialog extends Dialog {
 
         DATE = findViewById(R.id.INPUT_DATE);
         Calendar ca = Calendar.getInstance();
-        DATE.setText(ca.get(Calendar.YEAR) + ". " + ca.get(Calendar.MONTH) + 1 + ". " + ca.get(Calendar.DATE));
+        DATE.setText(ca.get(Calendar.YEAR) + "-" + ca.get(Calendar.MONTH) + 1 + "-" + ca.get(Calendar.DATE));
         MONEY = findViewById(R.id.INPUT_MONEY);
         STORE = findViewById(R.id.INPUT_STORE);
         COMMENT = findViewById(R.id.INPUT_COMMENT);
         CARD = findViewById(R.id.INPUT_CARD);
         USER = findViewById(R.id.INPUT_USER);
+        Log.i("jhy",Build.MODEL);
+        if(Build.MODEL.contains("SM-N950N")) {
+            USER.setText("하영");
+        }else {
+            USER.setText("소현");
+        }
         CATEGORY = findViewById(R.id.INPUT_CATE);
         SEND = findViewById(R.id.INPUT_SEND);
 
@@ -156,11 +160,11 @@ public class InputDialog extends Dialog {
         Dialog dialog = apiAvailability.getErrorDialog(
                 activity,
                 connectionStatusCode,
-                REQUEST_GOOGLE_PLAY_SERVICES);
+                JConst.REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 
-    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
+    @AfterPermissionGranted(JConst.REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 getContext(), android.Manifest.permission.GET_ACCOUNTS)) {
@@ -172,14 +176,14 @@ public class InputDialog extends Dialog {
                 // Start a dialog from which the user can choose an account
                 activity.startActivityForResult(
                         mCredential.newChooseAccountIntent(),
-                        REQUEST_ACCOUNT_PICKER);
+                        JConst.REQUEST_ACCOUNT_PICKER);
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     activity,
                     "This app needs to access your Google account (via Contacts).",
-                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    JConst.REQUEST_PERMISSION_GET_ACCOUNTS,
                     android.Manifest.permission.GET_ACCOUNTS);
         }
     }
@@ -201,29 +205,39 @@ public class InputDialog extends Dialog {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            SEND.setEnabled(false);
+        }
+
+        @Override
         protected String doInBackground(Void... params) {
             Log.i("jhy","doInBackground!");
             try {
-                return SheetUtils.putData(mService,mData);
+                String a = SheetUtils.putData(mService,mData);;
+                return a;
+//                return SheetUtils.getGagyeData(mService);
             } catch (UserRecoverableAuthIOException e) {
                 Log.i("jhy","doInBackground!"  + e.getMessage());
                 mLastError = e;
-                activity.startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
-                e.getStackTrace();
-                cancel(true);
-                return null;
+                activity.startActivityForResult(e.getIntent(), JConst.REQUEST_AUTHORIZATION);
+                e.printStackTrace();
             } catch(Exception e) {
                 mLastError = e;
-                e.getStackTrace();
-                cancel(true);
+                e.printStackTrace();
+            }finally {
                 return null;
             }
+
         }
 
         @Override
         protected void onPostExecute(String s) {
-            dismiss();
             super.onPostExecute(s);
+            if(null == s) {
+                Toast.makeText(activity,"실패! 문의바랍니다. <" + mLastError.getMessage() + ">",Toast.LENGTH_SHORT).show();
+            }
+            dismiss();
         }
     }
 

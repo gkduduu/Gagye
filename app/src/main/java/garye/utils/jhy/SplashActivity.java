@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import garye.utils.jhy.common.AlldayNotification;
+import garye.utils.jhy.common.JConst;
 import garye.utils.jhy.common.JPreferenceManager;
 import garye.utils.jhy.sheet.SheetUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -66,11 +67,8 @@ public class SplashActivity extends BaseActivity {
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
-    private static final String BUTTON_TEXT = "Call Google Sheets API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
-
-    GoogleAccountCredential mCredential;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +94,7 @@ public class SplashActivity extends BaseActivity {
         Glide.with(this).asGif().load(R.drawable.loading).into((ImageView) findViewById(R.id.SPL_IMAGE));
 
         //스프레드시트 이용을 위한 구글 인증
-        mCredential = GoogleAccountCredential.usingOAuth2(
+        JConst.getInstance().Credential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
@@ -124,7 +122,7 @@ public class SplashActivity extends BaseActivity {
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         JPreferenceManager.setString(this,PREF_ACCOUNT_NAME,accountName);
-                        mCredential.setSelectedAccountName(accountName);
+                        JConst.getInstance().Credential.setSelectedAccountName(accountName);
                         connectSheet();
                     }
                 }
@@ -141,7 +139,7 @@ public class SplashActivity extends BaseActivity {
     private void connectSheet() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
+        } else if (JConst.getInstance().Credential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!isDeviceOnline()) {
             //디바이스 오프라인
@@ -201,10 +199,10 @@ public class SplashActivity extends BaseActivity {
             String accountName = JPreferenceManager.getString(this,PREF_ACCOUNT_NAME);
             if (null == accountName) {
                 startActivityForResult(
-                        mCredential.newChooseAccountIntent(),
+                        JConst.getInstance().Credential.newChooseAccountIntent(),
                         REQUEST_ACCOUNT_PICKER);
             } else {
-                mCredential.setSelectedAccountName(accountName);
+                JConst.getInstance().Credential.setSelectedAccountName(accountName);
                 connectSheet();
 
             }

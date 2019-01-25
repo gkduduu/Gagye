@@ -1,4 +1,4 @@
-package garye.utils.jhy;
+package garye.utils.jhy.common;
 
 import android.app.Notification;
 import android.content.Intent;
