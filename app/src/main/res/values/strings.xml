@@ -95,4 +95,6 @@
 
     <string name="action_share">Share</string>
     <string name="action_reply">Reply</string>
+    <string name="appwidget_text">가계부</string>
+    <string name="add_widget">Add widget</string>
 </resources>

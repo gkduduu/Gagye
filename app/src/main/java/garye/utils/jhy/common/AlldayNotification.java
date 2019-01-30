@@ -60,15 +60,12 @@ public class AlldayNotification {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 
                 .setDefaults(Notification.DEFAULT_ALL)
-
                 .setSmallIcon(R.drawable.ic_stat_allday)
                 .setContentTitle(title)
                 .setContentText(text)
-
                 .setChannelId("channel_id")
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
                 .setLargeIcon(picture)
 
                 .setTicker(ticker)
