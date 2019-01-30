@@ -1,6 +1,7 @@
 package garye.utils.jhy.dialog;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,17 +84,27 @@ public class InputDialog extends Dialog {
                 .setBackOff(new ExponentialBackOff());
 
         DATE = findViewById(R.id.INPUT_DATE);
-        Calendar ca = Calendar.getInstance();
+        final Calendar ca = Calendar.getInstance();
         DATE.setText(ca.get(Calendar.YEAR) + "-" + ca.get(Calendar.MONTH) + 1 + "-" + ca.get(Calendar.DATE));
+        DATE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerDialog dialog = new DatePickerDialog(activity, listener, ca.get(Calendar.YEAR), ca.get(Calendar.MONTH), ca.get(Calendar.DATE));
+                dialog.show();
+            }
+        });
+
         MONEY = findViewById(R.id.INPUT_MONEY);
         STORE = findViewById(R.id.INPUT_STORE);
         COMMENT = findViewById(R.id.INPUT_COMMENT);
+
         CARD = findViewById(R.id.INPUT_CARD);
+
         USER = findViewById(R.id.INPUT_USER);
-        Log.i("jhy",Build.MODEL);
-        if(Build.MODEL.contains("SM-N950N")) {
+        Log.i("jhy", Build.MODEL);
+        if (Build.MODEL.contains("SM-N950N")) {
             USER.setText("하영");
-        }else {
+        } else {
             USER.setText("소현");
         }
         CATEGORY = findViewById(R.id.INPUT_CATE);
@@ -101,7 +113,10 @@ public class InputDialog extends Dialog {
         SEND.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("jhy","clickc!!!!!!!");
+                if (null == MONEY.getText() || MONEY.getText().toString().equals("")) {
+                    Toast.makeText(activity, "금액을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 mMaindata = new MainData();
                 mMaindata.setDate(DATE.getText().toString());
                 mMaindata.setMoney(MONEY.getText().toString());
@@ -116,8 +131,21 @@ public class InputDialog extends Dialog {
         });
     }
 
+    //달력
+    private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            monthOfYear = monthOfYear + 1;
+            String month = monthOfYear + "";
+            if(monthOfYear < 10) {
+                month = "0" + month;
+            }
+            DATE.setText(year + "-" + month + "-" + dayOfMonth);
+        }
+    };
+
     private void connectSheet() {
-        Log.i("jhy","connectSHeet!");
+        Log.i("jhy", "connectSHeet!");
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -125,7 +153,7 @@ public class InputDialog extends Dialog {
         } else if (!isDeviceOnline()) {
             //디바이스 오프라인
         } else {
-            new MakeRequestTask(mCredential,mMaindata).execute();
+            new MakeRequestTask(mCredential, mMaindata).execute();
         }
     }
 
@@ -168,7 +196,7 @@ public class InputDialog extends Dialog {
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 getContext(), android.Manifest.permission.GET_ACCOUNTS)) {
-            String accountName = JPreferenceManager.getString(getContext(),PREF_ACCOUNT_NAME);
+            String accountName = JPreferenceManager.getString(getContext(), PREF_ACCOUNT_NAME);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
                 connectSheet();
@@ -193,8 +221,8 @@ public class InputDialog extends Dialog {
         private MainData mData;
         private Exception mLastError = null;
 
-        MakeRequestTask(GoogleAccountCredential credential,MainData mainData) {
-            Log.i("jhy","MakeRequestTask!");
+        MakeRequestTask(GoogleAccountCredential credential, MainData mainData) {
+            Log.i("jhy", "MakeRequestTask!");
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mData = mainData;
@@ -212,20 +240,21 @@ public class InputDialog extends Dialog {
 
         @Override
         protected String doInBackground(Void... params) {
-            Log.i("jhy","doInBackground!");
+            Log.i("jhy", "doInBackground!");
             try {
-                String a = SheetUtils.putData(mService,mData);;
+                String a = SheetUtils.putData(mService, mData);
+                ;
                 return a;
 //                return SheetUtils.getGagyeData(mService);
             } catch (UserRecoverableAuthIOException e) {
-                Log.i("jhy","doInBackground!"  + e.getMessage());
+                Log.i("jhy", "doInBackground!" + e.getMessage());
                 mLastError = e;
                 activity.startActivityForResult(e.getIntent(), JConst.REQUEST_AUTHORIZATION);
                 e.printStackTrace();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 mLastError = e;
                 e.printStackTrace();
-            }finally {
+            } finally {
                 return null;
             }
 
@@ -234,8 +263,8 @@ public class InputDialog extends Dialog {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(null == s) {
-                Toast.makeText(activity,"실패! 문의바랍니다. <" + mLastError.getMessage() + ">",Toast.LENGTH_SHORT).show();
+            if (null == s && null != mLastError) {
+                Toast.makeText(activity, "실패! 문의바랍니다. <" + mLastError.getMessage() + ">", Toast.LENGTH_SHORT).show();
             }
             dismiss();
         }

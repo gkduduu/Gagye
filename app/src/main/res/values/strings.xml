@@ -78,9 +78,9 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_setting">SettingActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">가계부</string>
+    <string name="title_dashboard">설정</string>
+    <string name="title_notifications">뭐넣을까?</string>
 
     <string name="allday_notification_title_template">Allday: %1$s</string>
 
