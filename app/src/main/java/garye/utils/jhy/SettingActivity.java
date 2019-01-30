@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -19,7 +22,9 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import garye.utils.jhy.adapter.HistoryAdapter;
 import garye.utils.jhy.common.JConst;
 import garye.utils.jhy.common.JPreferenceManager;
 import garye.utils.jhy.data.MainData;
@@ -28,7 +33,9 @@ import garye.utils.jhy.sheet.SheetUtils;
 public class SettingActivity extends BaseActivity {
 
     private TextView mTextMessage;
+    private RecyclerView mRecyclerView;
     private ArrayList<MainData> mDataList = new ArrayList<>();
+    private ProgressBar mProgress;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -59,7 +66,7 @@ public class SettingActivity extends BaseActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-//        new MakeRequestTask().execute();
+        new MakeRequestTask().execute();
     }
 
     private class MakeRequestTask extends AsyncTask<Void, Void, String> {
@@ -76,10 +83,14 @@ public class SettingActivity extends BaseActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
         protected String doInBackground(Void... params) {
-            Log.i("jhy","doInBackground!");
             try {
-                mDataList = SheetUtils.getGagyeData(mService);;
+                mDataList = SheetUtils.getGagyeData(mService);
 //                return SheetUtils.getGagyeData(mService);
             } catch (UserRecoverableAuthIOException e) {
                 Log.i("jhy","doInBackground!"  + e.getMessage());
@@ -98,6 +109,14 @@ public class SettingActivity extends BaseActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+
+            mRecyclerView = findViewById(R.id.SET_RECYCLER);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setNestedScrollingEnabled(false);
+            mRecyclerView.setLayoutManager(layoutManager);
+
+            mRecyclerView.setAdapter(new HistoryAdapter(getApplicationContext(), mDataList, R.layout.activity_list));
         }
     }
 
