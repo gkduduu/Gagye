@@ -22,12 +22,10 @@ import garye.utils.jhy.data.MainData;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
     Context context;
     List<MainData> items;
-    int item_layout;
 
-    public HistoryAdapter(Context context, List<MainData> items, int item_layout) {
+    public HistoryAdapter(Context context, List<MainData> items) {
         this.context = context;
         this.items = items;
-        this.item_layout = item_layout;
     }
 
     @Override

@@ -1,9 +1,12 @@
 package garye.utils.jhy.dialog;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -11,12 +14,15 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,8 +70,18 @@ public class InputDialog extends Dialog {
     EditText CATEGORY;
     Button SEND;
 
+    RelativeLayout IN;
+    RelativeLayout OUT;
+    View INLINE;
+    View OUTLINE;
+
     MainData mMaindata;
     Activity activity;
+
+    boolean isGetCategory = false;
+
+    public CharSequence arrCate[] = new CharSequence[8];
+
 
     public InputDialog(@NonNull Activity context) {
         super(context);
@@ -87,7 +103,9 @@ public class InputDialog extends Dialog {
         final Calendar ca = Calendar.getInstance();
         int month = (ca.get(Calendar.MONTH) + 1);
         String strMonth = 10 > month ? "0" + month : month + "";
-        DATE.setText(ca.get(Calendar.YEAR) + "-" + strMonth + "-" + ca.get(Calendar.DATE));
+        int day = (ca.get(Calendar.DATE));
+        String strDay = 10 > day ? "0" + day : day + "";
+        DATE.setText(ca.get(Calendar.YEAR) + "-" + strMonth + "-" + strDay);
         DATE.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,6 +137,13 @@ public class InputDialog extends Dialog {
                     Toast.makeText(activity, "금액을 입력해주세요.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                SEND.setBackgroundResource(R.color.btnNonactive);
+                findViewById(R.id.INPUT_PROGRESS).setVisibility(View.VISIBLE);
+
+                InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                 mMaindata = new MainData();
                 mMaindata.setDate(DATE.getText().toString());
                 mMaindata.setMoney(MONEY.getText().toString());
@@ -129,8 +154,35 @@ public class InputDialog extends Dialog {
                 mMaindata.setCategory(CATEGORY.getText().toString());
 
                 connectSheet();
+
+
             }
         });
+
+        IN = findViewById(R.id.INPUT_IN);
+        OUT = findViewById(R.id.INPUT_OUT);
+        INLINE = findViewById(R.id.INPUT_INLINE);
+        OUTLINE = findViewById(R.id.INPUT_OUTLINE);
+        IN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IN.setBackgroundResource(R.color.btnActive);
+                OUT.setBackgroundResource(R.color.btnNonactive);
+                OUTLINE.setVisibility(View.VISIBLE);
+                INLINE.setVisibility(View.GONE);
+            }
+        });
+        OUT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OUT.setBackgroundResource(R.color.btnActive);
+                IN.setBackgroundResource(R.color.btnNonactive);
+                INLINE.setVisibility(View.VISIBLE);
+                OUTLINE.setVisibility(View.GONE);
+            }
+        });
+
+        connectSheet();
     }
 
     //달력
@@ -142,56 +194,25 @@ public class InputDialog extends Dialog {
             if (monthOfYear < 10) {
                 month = "0" + month;
             }
-            DATE.setText(year + "-" + month + "-" + dayOfMonth);
+            String day = dayOfMonth + "";
+            if (dayOfMonth < 10) {
+                day = "0" + day;
+            }
+            DATE.setText(year + "-" + month + "-" + day);
         }
     };
 
     private void connectSheet() {
         Log.i("jhy", "connectSHeet!");
-        if (!isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
+        if (!SheetUtils.isGooglePlayServicesAvailable(getContext())) {
+            SheetUtils.acquireGooglePlayServices(activity);
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
-        } else if (!isDeviceOnline()) {
+        } else if (!SheetUtils.isDeviceOnline(getContext())) {
             //디바이스 오프라인
         } else {
             new MakeRequestTask(mCredential, mMaindata).execute();
         }
-    }
-
-    private boolean isDeviceOnline() {
-        ConnectivityManager connMgr =
-                (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
-    }
-
-    private boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(getContext());
-        return connectionStatusCode == ConnectionResult.SUCCESS;
-    }
-
-    private void acquireGooglePlayServices() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(getContext());
-        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
-        }
-    }
-
-    void showGooglePlayServicesAvailabilityErrorDialog(
-            final int connectionStatusCode) {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog = apiAvailability.getErrorDialog(
-                activity,
-                connectionStatusCode,
-                JConst.REQUEST_GOOGLE_PLAY_SERVICES);
-        dialog.show();
     }
 
     @AfterPermissionGranted(JConst.REQUEST_PERMISSION_GET_ACCOUNTS)
@@ -244,19 +265,22 @@ public class InputDialog extends Dialog {
         protected String doInBackground(Void... params) {
             Log.i("jhy", "doInBackground!");
             try {
-                String a = SheetUtils.putData(mService, mData);
-                ;
-                return a;
+                if (isGetCategory) {
+                    return SheetUtils.putData(mService, mData);
+                } else {
+                    return SheetUtils.getOUTCategory(mService, InputDialog.this);
+                }
+
 //                return SheetUtils.getGagyeData(mService);
             } catch (UserRecoverableAuthIOException e) {
                 Log.i("jhy", "doInBackground!" + e.getMessage());
                 mLastError = e;
                 activity.startActivityForResult(e.getIntent(), JConst.REQUEST_AUTHORIZATION);
                 e.printStackTrace();
+                return null;
             } catch (Exception e) {
                 mLastError = e;
                 e.printStackTrace();
-            } finally {
                 return null;
             }
 
@@ -268,7 +292,28 @@ public class InputDialog extends Dialog {
             if (null == s && null != mLastError) {
                 Toast.makeText(activity, "실패! 문의바랍니다. <" + mLastError.getMessage() + ">", Toast.LENGTH_SHORT).show();
             }
-            dismiss();
+            if (s.equals("OK")) {
+                dismiss();
+            } else if (s.equals("CATE")) {
+                isGetCategory = true;
+                CATEGORY.setText(arrCate[0]);
+                CATEGORY.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle(Html.fromHtml("<font color='#3388DD'><b>카테고리</b></font>"));
+                        builder.setItems(arrCate, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                CATEGORY.setText(arrCate[which]);
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.show();
+                    }
+                });
+
+            }
         }
     }
 

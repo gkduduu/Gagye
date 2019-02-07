@@ -1,7 +1,14 @@
 package garye.utils.jhy.sheet;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -16,6 +23,7 @@ import java.util.List;
 
 import garye.utils.jhy.common.JConst;
 import garye.utils.jhy.data.MainData;
+import garye.utils.jhy.dialog.InputDialog;
 
 /**
  * Created by hayoung on 03/01/2019.
@@ -40,6 +48,25 @@ public class SheetUtils {
         }
         Log.i("jhy", "lastindex ===> " +lastIndex);
         return lastIndex;
+    }
+
+    //카테고리 불러오기
+    public static String getOUTCategory(Sheets service, InputDialog that) throws Exception {
+        String range = "요약!B28:B35";
+        ValueRange response = service.spreadsheets().values()
+                .get(JConst.SPREADSHEET_ID, range)
+                .execute();
+        String lastIndex = "";
+        List<List<Object>> values = response.getValues();
+        if (values != null) {
+            int i = 0;
+            for (List row : values) {
+                Log.i("jhy",row.get(0).toString());
+                that.arrCate[i] = row.get(0).toString();
+                i = i+1;
+            }
+        }
+        return "CATE";
     }
 
     public static String putData(Sheets service, MainData data) throws Exception {
@@ -98,4 +125,40 @@ public class SheetUtils {
         }
         return list;
     }
+
+
+    //온라인 확인
+    public static boolean isDeviceOnline(Context context) {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+    //스토어 활성화 확인
+    public static boolean isGooglePlayServicesAvailable(Context context) {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(context);
+        return connectionStatusCode == ConnectionResult.SUCCESS;
+    }
+    public static void acquireGooglePlayServices(Activity context) {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(context);
+        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode,context);
+        }
+    }
+    private static void showGooglePlayServicesAvailabilityErrorDialog(
+            final int connectionStatusCode, final Activity context) {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        Dialog dialog = apiAvailability.getErrorDialog(
+                context,
+                connectionStatusCode,
+                JConst.REQUEST_GOOGLE_PLAY_SERVICES);
+        dialog.show();
+    }
+
 }

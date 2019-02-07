@@ -14,13 +14,13 @@
         android:orientation="vertical">
 
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/SET_RECYCLER"
+        <FrameLayout
+            android:id="@+id/SET_FRAGMENT"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-        </android.support.v7.widget.RecyclerView>
+        </FrameLayout>>
 
 
         <android.support.design.widget.BottomNavigationView

@@ -16,16 +16,26 @@
             android:orientation="horizontal">
 
             <RelativeLayout
+                android:id="@+id/INPUT_OUT"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:background="#00000000">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:textColor="#000"
-                    android:text="지출" />
+                    android:text="지출"
+                    android:textColor="#000" />
+
+                <View
+                    android:id="@+id/INPUT_OUTLINE"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="#000"
+                    android:visibility="gone"></View>
             </RelativeLayout>
 
             <View
@@ -34,6 +44,7 @@
                 android:background="#000"></View>
 
             <RelativeLayout
+                android:id="@+id/INPUT_IN"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -46,6 +57,7 @@
                     android:text="수입" />
 
                 <View
+                    android:id="@+id/INPUT_INLINE"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
@@ -71,10 +83,10 @@
             <TextView
                 android:id="@+id/INPUT_DATE"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:textSize="15dp"
                 android:textColor="#000"
-                android:layout_height="wrap_content"/>
+                android:textSize="15dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -114,8 +126,8 @@
                 android:id="@+id/INPUT_MONEY"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
-                android:inputType="number" />
+                android:inputType="number"
+                android:textSize="15dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -135,8 +147,7 @@
                 android:id="@+id/INPUT_COMMENT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
-                 />
+                android:textSize="15dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -156,8 +167,7 @@
                 android:id="@+id/INPUT_CARD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
-                 />
+                android:textSize="15dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -177,8 +187,7 @@
                 android:id="@+id/INPUT_USER"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
-                 />
+                android:textSize="15dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -198,7 +207,10 @@
                 android:id="@+id/INPUT_CATE"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"/>
+                android:hint="불러오는중..."
+                android:focusable="false"
+                android:textColor="#000"
+                android:textSize="15dp" />
         </LinearLayout>
 
         <Button
@@ -208,10 +220,20 @@
             android:layout_margin="15dp"
             android:background="#38d"
             android:text="확인"
-            android:textSize="23dp"
-            android:textColor="#fff" />
-
+            android:textColor="#fff"
+            android:textSize="23dp" />
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/INPUT_PROGRESS"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
 
 </RelativeLayout>
