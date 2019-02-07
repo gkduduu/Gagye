@@ -85,7 +85,9 @@ public class InputDialog extends Dialog {
 
         DATE = findViewById(R.id.INPUT_DATE);
         final Calendar ca = Calendar.getInstance();
-        DATE.setText(ca.get(Calendar.YEAR) + "-" + ca.get(Calendar.MONTH) + 1 + "-" + ca.get(Calendar.DATE));
+        int month = (ca.get(Calendar.MONTH) + 1);
+        String strMonth = 10 > month ? "0" + month : month + "";
+        DATE.setText(ca.get(Calendar.YEAR) + "-" + strMonth + "-" + ca.get(Calendar.DATE));
         DATE.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,7 +139,7 @@ public class InputDialog extends Dialog {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             monthOfYear = monthOfYear + 1;
             String month = monthOfYear + "";
-            if(monthOfYear < 10) {
+            if (monthOfYear < 10) {
                 month = "0" + month;
             }
             DATE.setText(year + "-" + month + "-" + dayOfMonth);
