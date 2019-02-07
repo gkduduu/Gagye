@@ -154,8 +154,6 @@ public class InputDialog extends Dialog {
                 mMaindata.setCategory(CATEGORY.getText().toString());
 
                 connectSheet();
-
-
             }
         });
 
@@ -258,7 +256,8 @@ public class InputDialog extends Dialog {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            SEND.setEnabled(false);
+            if (isGetCategory)
+                SEND.setEnabled(false);
         }
 
         @Override
@@ -266,11 +265,11 @@ public class InputDialog extends Dialog {
             Log.i("jhy", "doInBackground!");
             try {
                 if (isGetCategory) {
+                    SEND.setEnabled(false);
                     return SheetUtils.putData(mService, mData);
                 } else {
                     return SheetUtils.getOUTCategory(mService, InputDialog.this);
                 }
-
 //                return SheetUtils.getGagyeData(mService);
             } catch (UserRecoverableAuthIOException e) {
                 Log.i("jhy", "doInBackground!" + e.getMessage());
