@@ -25,6 +25,9 @@ import garye.utils.jhy.sheet.SheetUtils;
 
 public class SettingActivity extends BaseActivity {
 
+    ListFragment listFragment = new ListFragment();
+    SettingFragment settingFragment = new SettingFragment();
+
     private TextView mTextMessage;
 //    private RecyclerView mRecyclerView;
 //    private ArrayList<MainData> mDataList = new ArrayList<>();
@@ -34,15 +37,19 @@ public class SettingActivity extends BaseActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
             switch (item.getItemId()) {
+
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+                    fragmentTransaction.replace(R.id.SET_FRAGMENT, listFragment);
+                    fragmentTransaction.commit();
                     return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    fragmentTransaction.replace(R.id.SET_FRAGMENT, settingFragment);
+                    fragmentTransaction.commit();
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
             return false;
@@ -56,7 +63,7 @@ public class SettingActivity extends BaseActivity {
 
         FragmentManager fm = getFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
-        fragmentTransaction.add(R.id.SET_FRAGMENT, new ListFragment());
+        fragmentTransaction.add(R.id.SET_FRAGMENT, listFragment);
         fragmentTransaction.commit();
 
         mTextMessage = findViewById(R.id.message);

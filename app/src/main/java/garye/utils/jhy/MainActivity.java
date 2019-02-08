@@ -386,8 +386,6 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
             return results;
         }
 
-
-
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");

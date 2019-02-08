@@ -84,16 +84,19 @@ public class ListFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            try {
+                getActivity().findViewById(R.id.SET_PROGRESS).setVisibility(View.GONE);
 
-            getActivity().findViewById(R.id.SET_PROGRESS).setVisibility(View.GONE);
+                mRecyclerView = getActivity().findViewById(R.id.SET_RECYCLER);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+                mRecyclerView.setHasFixedSize(true);
+                mRecyclerView.setNestedScrollingEnabled(false);
+                mRecyclerView.setLayoutManager(layoutManager);
 
-            mRecyclerView = getActivity().findViewById(R.id.SET_RECYCLER);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-            mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setNestedScrollingEnabled(false);
-            mRecyclerView.setLayoutManager(layoutManager);
-
-            mRecyclerView.setAdapter(new HistoryAdapter(getContext(), mDataList));
+                mRecyclerView.setAdapter(new HistoryAdapter(getContext(), mDataList));
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
