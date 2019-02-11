@@ -42,6 +42,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         } else if("수입".equals(item.getState())) {
             holder.hisState.setBackgroundColor(Color.parseColor("#5B5AFF"));
         }
+        holder.hisDate.setText(item.getDate());
         holder.hisShop.setText(item.getStore());
         holder.hisMoney.setText(item.getMoney());
         holder.hisCard.setText(item.getCard());
