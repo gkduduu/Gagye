@@ -25,7 +25,7 @@ import garye.utils.jhy.sheet.SheetUtils;
 
 public class SettingActivity extends BaseActivity {
 
-    ListFragment listFragment = new ListFragment();
+    CalendarFragment listFragment = new CalendarFragment();
     SettingFragment settingFragment = new SettingFragment();
 
     private TextView mTextMessage;

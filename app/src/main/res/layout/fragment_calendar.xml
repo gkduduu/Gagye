@@ -17,10 +17,13 @@
     <GridView
         android:id="@+id/gridview"
         android:layout_width="match_parent"
+        android:background="#EAEAEA"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_weight="1"
-        android:listSelector="#fff"
+        android:listSelector="#B5B4FF"
+        android:horizontalSpacing="1dp"
+        android:verticalSpacing="1dp"
         android:numColumns="7">
 
     </GridView>

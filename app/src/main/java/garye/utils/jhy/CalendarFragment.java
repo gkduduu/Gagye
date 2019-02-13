@@ -69,7 +69,6 @@ public class CalendarFragment extends Fragment {
         gridAdapter = new GridAdapter(getContext(), dayList);
         gridView.setAdapter(gridAdapter);
 
-
         return view;
     }
 
@@ -112,11 +111,22 @@ public class CalendarFragment extends Fragment {
                 convertView = inflater.inflate(R.layout.item_calendar, parent, false);
                 holder = new ViewHolder();
                 holder.tvItemGridView = convertView.findViewById(R.id.tv_item_gridview);
+                holder.tvItemGridday = convertView.findViewById(R.id.tv_item_gridday);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            holder.tvItemGridView.setText("" + getItem(position));
+            if(position>7) {
+                holder.tvItemGridday.setText("" + getItem(position));
+                if((position+7)%7 == 0) {
+                    holder.tvItemGridday.setTextColor(Color.RED);
+                }
+            }else {
+                holder.tvItemGridView.setText("" + getItem(position));
+                if((position+7)%7 == 0) {
+                    holder.tvItemGridView.setTextColor(Color.RED);
+                }
+            }
 
             //해당 날짜 텍스트 컬러,배경 변경
             mCal = Calendar.getInstance();
@@ -124,7 +134,7 @@ public class CalendarFragment extends Fragment {
             Integer today = mCal.get(Calendar.DAY_OF_MONTH);
             String sToday = String.valueOf(today);
             if (sToday.equals(getItem(position))) { //오늘 day 텍스트 컬러 변경
-                holder.tvItemGridView.setTextColor(Color.parseColor("#000000"));
+                holder.tvItemGridday.setTextColor(Color.parseColor("#000000"));
             }
             return convertView;
         }
@@ -132,6 +142,7 @@ public class CalendarFragment extends Fragment {
 
     private class ViewHolder {
         TextView tvItemGridView;
+        TextView tvItemGridday;
     }
 
 }
