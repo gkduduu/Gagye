@@ -53,9 +53,12 @@ import java.util.List;
 import java.util.Map;
 
 import garye.utils.jhy.common.AlldayNotification;
+import garye.utils.jhy.common.BixbyInterceptService;
 import garye.utils.jhy.common.JConst;
 import garye.utils.jhy.common.JPreferenceManager;
+import garye.utils.jhy.common.RealmUtils;
 import garye.utils.jhy.sheet.SheetUtils;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -77,6 +80,13 @@ public class SplashActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
+
+//        try {
+//            RealmUtils.addCard(this, "하영크마");
+//            RealmUtils.queryAll(this);
+//        }catch(RealmPrimaryKeyConstraintException e) {
+//            Toast.makeText(this, "이미 존재하는 카드명", Toast.LENGTH_SHORT).show();
+//        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
