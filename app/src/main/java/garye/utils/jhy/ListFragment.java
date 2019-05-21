@@ -55,7 +55,7 @@ public class ListFragment extends Fragment {
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, JConst.getInstance().Credential)
-                    .setApplicationName("Google Sheets API Android Quickstart")
+                    .setApplicationName("Gagye")
                     .build();
         }
 

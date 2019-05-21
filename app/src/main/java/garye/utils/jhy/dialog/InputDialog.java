@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -277,7 +278,9 @@ public class InputDialog extends Dialog {
                 activity.startActivityForResult(e.getIntent(), JConst.REQUEST_AUTHORIZATION);
                 e.printStackTrace();
                 return null;
+
             } catch (Exception e) {
+                Log.i("jhy", "error!" + e.getMessage());
                 mLastError = e;
                 e.printStackTrace();
                 return null;
@@ -291,8 +294,10 @@ public class InputDialog extends Dialog {
             if (null == s && null != mLastError) {
                 Toast.makeText(activity, "실패! 문의바랍니다. <" + mLastError.getMessage() + ">", Toast.LENGTH_SHORT).show();
             }
+            if(null == s) return;
             if (s.equals("OK")) {
                 dismiss();
+
             } else if (s.equals("CATE")) {
                 isGetCategory = true;
                 CATEGORY.setText(arrCate[0]);
